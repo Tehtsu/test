@@ -2,7 +2,7 @@
 
 class Database
 {
-    private $conn;
+    public $conn;
 
     /**
      * @param
@@ -13,19 +13,19 @@ class Database
     }
 
     public function getDays() {
-        $stmt = $this->conn->prepare('SELECT name FROM days');
+        $stmt = $this->conn->prepare('SELECT * FROM days');
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
     public function getGames() {
-        $stmt = $this->conn->prepare('SELECT name FROM games');
+        $stmt = $this->conn->prepare('SELECT * FROM games');
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
     public function getTime() {
-        $stmt = $this->conn->prepare('SELECT time FROM time');
+        $stmt = $this->conn->prepare('SELECT * FROM time');
         $stmt->execute();
         return $stmt->fetchAll();
     }

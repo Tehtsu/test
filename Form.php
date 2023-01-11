@@ -30,7 +30,7 @@ class Form
         echo '<br>';
 
         echo '<label for="game">Spiel:</label>';
-        echo '<select name="game[]" id="game" multiple>';
+        echo '<select name="game[]" id="game">';
         foreach ($games as $game) {
             echo '<option value="' . $game['id'] . '">' . $game['name'] . '</option>';
         }
@@ -49,13 +49,41 @@ class Form
         echo '<input type="text" name="name" id="name">';
         echo '<br>';
 
-        echo '<label for="datum">Datum:</label>';
-        echo '<input type="date" name="datum" id="datum">';
+        echo '<label for="date">Datum:</label>';
+        echo '<input type="date" name="date" id="date">';
         echo '<br>';
 
         echo '<input type="submit" value="Submit">';
         echo '</form>';
+    }public function validateAndSafeData()
+    {
 
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            //get fields from form
+            $day = $_POST['day'];
+            $game = $_POST['game'];
+            $time = $_POST['time'];
+            $name = $_POST['name'];
+            $date = $_POST['date'];
 
+            //validate
+            if (empty($day) || empty($game) || empty($time) || empty($name) || empty($date)) {
+                echo 'Alle Felder müssen ausgefüllt sein';
+                return;
+            }
+            //save data to database
+            $stmt = $this->db->conn->prepare("INSERT INTO overview(day_id, game_id, time_id, name, datum)
+                 VALUES (:day, :game, :time, :name, :date)");
+            $stmt->bindParam(':day', $day);
+            $stmt->bindParam(':game', implode(",", $game));
+            $stmt->bindParam(':time', implode(",", $time));
+            $stmt->bindParam(':name', $name);
+            $stmt->bindParam(':date', $date);
+
+            $stmt->execute();
+
+            echo "Daten erfolgreich gespeichert!";
+
+        }
     }
 }
