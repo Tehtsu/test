@@ -20,49 +20,53 @@ class Form
         $times = $this->db->getTime();
 
         // create form
-        echo '<form method="post">';
-        echo '<label for="day">Tag:</label>';
-        echo '<select name="day" id="day">';
+        echo '<form method="post">' .
+            '<label for="day">Tag:</label>' .
+            '<select name="day" id="day">';
         foreach ($days as $day) {
             echo '<option value="' . $day['id'] . '">' . $day['name'] . '</option>';
         }
-        echo '</select>';
-        echo '<br>';
+        echo '</select>' .
+            '<br>';
 
-        echo '<label for="game">Spiel:</label>';
-        echo '<select name="game[]" id="game">';
+        echo '<label for="game">Spiel:</label>' .
+            '<select name="game[]" id="game">';
         foreach ($games as $game) {
             echo '<option value="' . $game['id'] . '">' . $game['name'] . '</option>';
         }
-        echo '</select>';
-        echo '<br>';
+        echo '</select>' .
+            '<br>';
 
-        echo '<label for="time">Uhrzeit:</label>';
-        echo '<select name="time[]" id="time" multiple>';
+        /*echo '<label for="time">Uhrzeit:</label>' .
+            '<select name="time[]" id="time" multiple>';
         foreach ($times as $time) {
             echo '<option value="' . $time['id'] . '">' . $time['time'] . '</option>';
         }
-        echo '</select>';
-        echo '<br>';
+        echo '</select>' .*/
+        echo '<label for="time">Uhrzeit:</label>' .
+            '<input type="text" name="time" id="time" placeholder="z.B. 18 - 22">' .
+            '<br>' .
 
-        echo '<label for="name">Name:</label>';
-        echo '<input type="text" name="name" id="name">';
-        echo '<br>';
+            '<label for="name">Name:</label>' .
+            '<input type="text" name="name" id="name">' .
+            '<br>' .
 
-        echo '<label for="date">Datum:</label>';
-        echo '<input type="date" name="date" id="date">';
-        echo '<br>';
+            '<label for="date">Datum:</label>' .
+            '<input type="date" name="date" id="date">' .
+            '<br>' .
 
-        echo '<input type="submit" value="Submit">';
-        echo '</form>';
-    }public function validateAndSafeData()
+            '<input type="submit" value="Submit">' .
+            '</form>';
+    }
+
+    public function validateAndSafeData()
     {
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             //get fields from form
             $day = $_POST['day'];
             $game = $_POST['game'];
-            $time = $_POST['time'];
+            $time = $_POST['time'] . " Uhr";
             $name = $_POST['name'];
             $date = $_POST['date'];
 
@@ -71,12 +75,19 @@ class Form
                 echo 'Alle Felder müssen ausgefüllt sein';
                 return;
             }
+            if (!preg_match("/^[0-9]*$/", $time) && !str_contains($time, ' - ')) {
+                echo "Die Uhrzeitangabe darf nur aus Zahlen, Leerzeichen und Bindestrich bestehen! z.B. 18 - 19";
+                return;
+            }
+
             //save data to database
-            $stmt = $this->db->conn->prepare("INSERT INTO overview(day_id, game_id, time_id, name, datum)
-                 VALUES (:day, :game, :time, :name, :date)");
+            $stmt = $this->db->conn->prepare("INSERT INTO overview(day_id, game_id, times, name, datum)
+                 VALUES (:day, :game, :times, :name, :date)");
+
+
             $stmt->bindParam(':day', $day);
             $stmt->bindParam(':game', implode(",", $game));
-            $stmt->bindParam(':time', implode(",", $time));
+            $stmt->bindParam(':times', $time);
             $stmt->bindParam(':name', $name);
             $stmt->bindParam(':date', $date);
 

@@ -25,7 +25,7 @@ class Database
     }
 
     public function getTime() {
-        $stmt = $this->conn->prepare('SELECT * FROM time');
+        $stmt = $this->conn->prepare('SELECT * FROM times');
         $stmt->execute();
         return $stmt->fetchAll();
     }
